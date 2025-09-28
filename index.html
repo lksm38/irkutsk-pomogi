@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сообщи нам — Иркутская область</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #fdfdfd;
+      color: #222;
+    }
+    header {
+      background: #b30000;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    header img {
+      height: 80px;
+      margin: 10px;
+      vertical-align: middle;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    form label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form textarea {
+      min-height: 120px;
+    }
+    form button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      background: #b30000;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background: #a00000;
+    }
+    footer {
+      text-align: center;
+      background: #eee;
+      padding: 20px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="logo_main.jpeg" alt="Сообщи нам">
+  <img src="logo_kprf.jpeg" alt="КПРФ">
+  <img src="logo_lksm.jpeg" alt="ЛКСМ РФ">
+  <h1>Сообщи нам — Иркутская область</h1>
+</header>
+
+<div class="container">
+  <h2>Оставьте своё обращение</h2>
+  <form id="appealForm">
+    <label>ФИО</label>
+    <input type="text" name="fio" required>
+
+    <label>Контактные данные (телефон или email)</label>
+    <input type="text" name="contact" required>
+
+    <label>Тема обращения</label>
+    <input type="text" name="subject" required>
+
+    <label>Текст обращения</label>
+    <textarea name="message" required></textarea>
+
+    <button type="submit">Отправить</button>
+  </form>
+</div>
+
+<footer>
+  <p><b>Контакты:</b> Иркутская область, ул. Российская, д. 20, каб. 210</p>
+  <p>Email для обращений: <a href="mailto:Iksmirkobl@mail.ru">Iksmirkobl@mail.ru</a></p>
+</footer>
+
+<script>
+  const TELEGRAM_TOKEN = "7656675277:AAFTqNnhW3KnQr4yF0ohwkzd1CQov-MKi1s";
+  const CHAT_ID = "-1002641532508";
+  const FORM_ENDPOINT = "https://formspree.io/f/xrbyerwr"; // 
+
+  document.getElementById("appealForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const fio = data.get("fio");
+    const contact = data.get("contact");
+    const subject = data.get("subject");
+    const message = data.get("message");
+
+    // Отправка в Telegram
+    const text = 📢 Новое обращение\n\n👤 ФИО: ${fio}\n📞 Контакт: ${contact}\n📝 Тема: ${subject}\n\n${message};
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({chat_id: CHAT_ID, text})
+    });
+
+    // Отправка на Email через Formspree
+    await fetch(FORM_ENDPOINT, {
+      method: "POST",
+      body: data,
+      headers: { "Accept": "application/json" }
+    });
+
+    alert("Ваше обращение отправлено!");
+    e.target.reset();
+  });
+</script>
+
+</body>
+</html>
